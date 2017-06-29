@@ -41,7 +41,17 @@ pointelevation_wgs<-as.data.frame(pointelevation_wgs)
 library(elevatr)
 
 df_elev <-get_elev_point(pointelevation_wgs, prj='+proj=longlat +datum=WGS84',src = "mapzen", api_key=key)
-plot(df_elev$elevation, type="l")
+df_elev<-as.data.frame(df_elev)
+
+#plot(df_elev$elevation, type="l")
+
+library(plotly)
+
+p <- plot_ly(x = ~df_elev$x, y = ~df_elev$elevation, type = 'scatter', mode = 'lines', fill = 'tozeroy') %>%
+  layout( title = paste0(munro1$Name,", ", round(mean(df_elev$y,rm=T),2), "°"),
+          xaxis = list(title = 'Longitude'),
+          yaxis = list(title = 'Elevation (m)'))
+p
 
 # Create polyline of points
 
