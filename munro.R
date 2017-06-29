@@ -1,4 +1,4 @@
-# scrape locations of munros
+key<-readline("Enter api key:") 
 
 # actually just downloaded from here : http://www.hills-database.co.uk/
 data<-read.csv("data/DoBIH_v15.5.csv")
@@ -37,10 +37,10 @@ pointelevation@proj4string = CRS(bng)
 pointelevation_wgs = spTransform(pointelevation, CRS(wgs84))
 pointelevation_wgs<-as.data.frame(pointelevation_wgs)
   
-## mapzen-t7vaRHo
+## 
 library(elevatr)
 
-df_elev <-get_elev_point(pointelevation_wgs, prj='+proj=longlat +datum=WGS84',src = "mapzen", api_key="mapzen-t7vaRHo")
+df_elev <-get_elev_point(pointelevation_wgs, prj='+proj=longlat +datum=WGS84',src = "mapzen", api_key=key)
 plot(df_elev$elevation, type="l")
 
 # Create polyline of points
