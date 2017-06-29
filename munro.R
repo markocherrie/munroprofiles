@@ -1,4 +1,4 @@
-key<-readline("Enter api key:") 
+#key<-readline("Enter api key:") 
 
 # actually just downloaded from here : http://www.hills-database.co.uk/
 data<-read.csv("data/DoBIH_v15.5.csv")
@@ -6,15 +6,15 @@ munros<-data[data$M==1,]
 
 # take points equidistant from location of munro, east to west?
 # let's do one
-munro1<-munros[2,]
+munro1<-munros[18,]
 
 # function
 library(sp)
 library(maptools)
 
 coordsCENT = cbind(munro1$Xcoord, munro1$Ycoord)
-coordsWEST = cbind(munro1$Xcoord-1500, munro1$Ycoord)
-coordsEAST = cbind(munro1$Xcoord+1500, munro1$Ycoord)
+coordsWEST = cbind(munro1$Xcoord-3000, munro1$Ycoord)
+coordsEAST = cbind(munro1$Xcoord+3000, munro1$Ycoord)
 
 dataw<-as.data.frame(rbind(coordsEAST, coordsWEST))
 colnames(dataw)<-c("east", "north")
@@ -53,10 +53,33 @@ p <- plot_ly(x = ~df_elev$x, y = ~df_elev$elevation, type = 'scatter', mode = 'l
           yaxis = list(title = 'Elevation (m)'))
 p
 
-# Create polyline of points
+# routes from http://www.haroldstreet.org.uk/routes/?filter=munro&area=scotland&page=7
 
-# upload DEM model
 
-# extract values of DEM along polyline
+# raster example
+munropoint<-data.frame(x=munro1$Xcoord, y=munro1$Ycoord)
 
-# plot result
+#dataw<-as.data.frame(rbind(coordsEAST, coordsWEST))
+#colnames(dataw)<-c("x", "y")
+munropointsp = SpatialPoints(dataw)
+
+munropointsp = SpatialPoints(munropoint)
+munropointsp@proj4string = CRS(bng)
+munropolygon<-gBuffer(munropointsp, 1000, byid=T)
+# reproject data to Mercator coordinate system
+#munropolygon = spTransform(munropolygon, CRS(wgs84))
+
+
+elevation <- get_elev_raster(munropolygon, z = 12,prj=bng, api_key = key)
+#plot(elevation)
+
+#if too jaggy
+elevation <- disaggregate(elevation, 5)
+elevation <- focal(elevation, w=matrix(1, 5, 5), mean)
+
+##
+#install.packages("rasterVis")
+library(rasterVis)
+plot3D(elevation)   # note: 3D not 3d
+
+
